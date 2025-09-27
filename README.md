@@ -4,7 +4,7 @@ This repository contains the source code, scripts, and documentation for a Cloud
 
 ## Project Overview
 - **Path**: `/home/deepblue/cloud_computing`
-- **Environment**: Ubuntu Linux (e.g., VirtualBox VM), Python (Flask), Heroku CLI, OpenSSH
+- **Environment**: Ubuntu Linux (e.g., VirtualBox VM), Python (Flask), Heroku CLI, OpenSSH, Vagrant
 - **Purpose**: Learn cloud computing fundamentals through hands-on labs, with outputs verified via terminal logs and cloud dashboards.
 - **Structure**: Weekly scripts and command histories called in lab sessions to demonstrate concepts.
 
@@ -70,3 +70,51 @@ This repository contains the source code, scripts, and documentation for a Cloud
    - Installed Git: `sudo apt install git -y`.
    - Configured identity: `git config --global user.name "Your Name"` and `git config --global user.email "your.email@example.com"`.
    - Initialized repository: `git init`, added files (`git add .`), committed (`git commit -m "Initial commit"`), and pushed to GitHub (`git remote add origin <repo-url> && git push -u origin main`).
+
+## Week 04: Data Centers and Cloud Architecture
+### Objectives
+- Understand physical and logical data center infrastructure components.
+- Learn about server hardware, networking, cooling, and power management.
+- Explore virtualization technologies and cloud architecture patterns.
+- Study scalability, fault tolerance, and geographic distribution of cloud services.
+
+### Content
+1. **Theory: Data Centers and Cloud Architecture**:
+   - Data center components: Servers, storage, networking equipment, cooling systems, power distribution.
+   - Virtualization concepts: Hypervisors, virtual machines, resource allocation and management.
+   - Cloud architecture patterns: Multi-tier architectures, microservices, load balancing, auto-scaling.
+   - Geographic distribution: Availability zones, regions, content delivery networks (CDN).
+   - Fault tolerance: Redundancy, backup systems, disaster recovery planning.
+
+2. **Hands-on Lab: IaaS with Vagrant - Web Server Deployment**:
+   - **Environment Setup**: Used Vagrant with VirtualBox to create reproducible IaaS environment.
+   - **Configuration Files**:
+     - `Vagrantfile`: Configured Ubuntu 24.04 VM with 2GB RAM, 2 CPUs, port forwarding (80→8080).
+     - `bootstrap.sh`: Shell provisioning script for automated Apache installation and configuration.
+     - `index.html`: Simple web content to verify successful deployment.
+   
+   - **Key Features Implemented**:
+     - **VM Configuration**: 
+       ```ruby
+       config.vm.box = "bento/ubuntu-24.04"
+       config.vm.provider "virtualbox" do |vb|
+         vb.name = "IaaS-WebServer"
+         vb.memory = "2048"
+         vb.cpus = 2
+       end
+       ```
+     - **Network Setup**: Port forwarding and private network configuration.
+     - **Automated Provisioning**: Apache web server installation and configuration.
+     - **Shared Folders**: Synchronization between host and guest systems.
+   
+   - **Deployment Process**:
+     1. `vagrant up`: Launch and provision VM automatically.
+     2. Access web server via `http://localhost:8080` or `http://192.168.33.10`.
+     3. Verify deployment with custom HTML content.
+     4. `vagrant destroy`: Clean up resources when done.
+   
+   - **Learning Outcomes**:
+     - Demonstrated IaaS concepts through hands-on VM management.
+     - Understood infrastructure provisioning and automation.
+     - Experienced web server deployment in virtualized environment.
+     - Learned about network configuration and port forwarding in cloud contexts.
