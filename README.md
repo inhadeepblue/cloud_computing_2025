@@ -118,3 +118,58 @@ This repository contains the source code, scripts, and documentation for a Cloud
      - Understood infrastructure provisioning and automation.
      - Experienced web server deployment in virtualized environment.
      - Learned about network configuration and port forwarding in cloud contexts.
+
+## Week 05: Virtualization
+### Objectives
+- Understand and explain the concepts and types of virtualization
+- Analyze CPU, memory, network, and storage virtualization technologies
+- Compare characteristics and differences of major hypervisors
+- Evaluate advantages, disadvantages, and performance considerations of virtualization technologies
+- Build and manage virtualized environments
+
+### Content
+1. **Theory: Virtualization Technologies**:
+   - **Virtualization Fundamentals**: Hardware abstraction, resource pooling, isolation principles.
+   - **Hypervisor Types**: 
+     - Type 1 (Bare-metal): VMware ESXi, Microsoft Hyper-V, Citrix XenServer.
+     - Type 2 (Hosted): VMware Workstation, Oracle VirtualBox, Parallels Desktop.
+   - **Virtualization Techniques**:
+     - Hardware-assisted virtualization (Intel VT-x, AMD-V).
+   - **Resource Management**: CPU virtualization, memory virtualization, network virtualization, storage virtualization.
+   - **Virtual Machine Lifecycle**: Creation, deployment, migration, snapshotting, backup and recovery.
+   - **Performance Considerations**: Overhead analysis, optimization techniques, resource contention.
+
+2. **Hands-on Lab: Inline Vagrant Provisioning with Arch Linux**:
+   - **Simple VM Configuration**: Used streamlined Vagrant setup with inline provisioning.
+   - **Configuration Features**:
+     ```ruby
+     Vagrant.configure("2") do |config|
+       config.vm.box = "dreamscapes/archlinux"
+       config.vm.network "forwarded_port", guest: 22, host: 2221
+       config.vm.provision "shell", inline: <<-SHELL
+         echo "Hello~ IaaS: Provisioned!" >> /home/vagrant/hello.txt
+         sudo pacman -Sy --noconfirm nano
+       SHELL
+     end
+     ```
+
+   - **Key Learning Points**:
+     - **Simplified Provisioning**: Demonstrated inline shell provisioning without separate script files.
+     - **Alternative OS**: Used Arch Linux instead of Ubuntu to show cross-platform virtualization.
+     - **Port Forwarding**: SSH port mapping (22→2221) for remote access configuration.
+     - **Package Management**: Arch Linux's pacman package manager usage in automated setup.
+     - **File System Operations**: Automated file creation and text editor installation.
+
+   - **Deployment Process**:
+     1. `vagrant up`: Launch Arch Linux VM with inline provisioning.
+     2. `vagrant ssh`: Connect using custom SSH port (2221).
+     3. Verify provisioning: Check `/home/vagrant/hello.txt` file creation.
+     4. Test installed software: Use nano text editor.
+     5. `vagrant halt` and `vagrant destroy`: Lifecycle management practice.
+
+   - **Learning Outcomes**:
+     - Experienced different Linux distributions in virtualized environments.
+     - Understood inline vs. external provisioning script approaches.
+     - Practiced VM lifecycle management and SSH connectivity.
+     - Learned cross-platform package management in automated deployments.
+     - Demonstrated virtualization portability across different guest operating systems.
