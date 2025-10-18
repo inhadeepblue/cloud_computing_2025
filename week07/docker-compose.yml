@@ -60,3 +60,4 @@ cat > html/index.html << 'EOF'
     </script>
 </body>
 </html>
+EOF
