@@ -1,3 +1,5 @@
+# docker-compose.yml 파일 생성
+cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
 services:
@@ -25,7 +27,7 @@ services:
     networks:
       - app-net
 
-  # 캐시 메모리
+  # Redis 캐시
   redis:
     image: redis:alpine
     networks:
@@ -37,6 +39,7 @@ volumes:
 networks:
   app-net:
     driver: bridge
+EOF
 
 # HTML 파일 생성
 mkdir html
@@ -61,3 +64,24 @@ cat > html/index.html << 'EOF'
 </body>
 </html>
 EOF
+
+# 애플리케이션 시작
+docker compose up -d
+
+# 서비스 상태 확인
+docker compose ps
+
+# 로그 확인
+docker compose logs web
+
+# 브라우저에서 http://localhost:8080 확인
+
+# 데이터베이스 연결 테스트
+docker compose exec db psql -U admin -d myapp
+# PostgreSQL 내부에서: \l (데이터베이스 목록), \q (종료)
+
+# 서비스 스케일링
+docker compose up -d --scale web=2
+
+# 정리
+docker compose down -v
