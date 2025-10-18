@@ -37,3 +37,26 @@ volumes:
 networks:
   app-net:
     driver: bridge
+
+# HTML 파일 생성
+mkdir html
+cat > html/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head><title>Docker Compose Lab</title></head>
+<body>
+    <h1>Multi-Container Application</h1>
+    <h3>Services Running:</h3>
+    <ul>
+        <li>Nginx Web Server (Port 8080)</li>
+        <li>PostgreSQL Database</li>
+        <li>Redis Cache</li>
+    </ul>
+    <p>Time: <span id="time"></span></p>
+    <script>
+        setInterval(() => {
+            document.getElementById('time').textContent = new Date().toLocaleString();
+        }, 1000);
+    </script>
+</body>
+</html>
