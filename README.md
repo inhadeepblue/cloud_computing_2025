@@ -173,3 +173,337 @@ This repository contains the source code, scripts, and documentation for a Cloud
      - Practiced VM lifecycle management and SSH connectivity.
      - Learned cross-platform package management in automated deployments.
      - Demonstrated virtualization portability across different guest operating systems.
+
+## Week 06: Container Technology and Docker
+
+### Objectives
+
+- Understand container technology concepts and differences from virtual machines
+- Explain Docker architecture and core components
+- Manage Docker image and container lifecycle
+- Practice Docker networking and data management with volumes
+
+### Content
+
+1. **Theory: Container Technology and Docker**:
+   
+   - **Container Technology Overview**:
+     - Containers package applications and dependencies into isolated environments using OS-level virtualization.
+     - Emerged to solve the "it works on my machine" problem with environment consistency.
+     - **Key Motivations**: Environment consistency, dependency management, deployment efficiency, resource efficiency.
+   
+   - **Containers vs Virtual Machines**:
+     - **VM Architecture**: Physical Server → Hypervisor → Complete Guest OS per VM → Applications
+     - **Container Architecture**: Physical Server → Host OS → Container Runtime → Applications
+     - **Performance Comparison**: Containers achieve 78% resource utilization vs. 42% for VMs, with 28% higher throughput and 37% lower latency.
+     - **Startup Time**: Containers start in 1-2 seconds vs. several minutes for VMs.
+   
+   - **Docker Architecture**:
+     - **Client-Server Architecture** with REST API communication:
+       - **Docker Client (CLI)**: User interface for Docker interaction
+       - **Docker Daemon (dockerd)**: Manages Docker objects (images, containers, networks, volumes)
+       - **Container Runtime**: containerd (high-level) + runc (low-level execution)
+     - **Docker Objects**:
+       - **Images**: Read-only templates with layered structure for efficient storage
+       - **Containers**: Runnable instances of images with isolated processes
+       - **Registry**: Services for storing and distributing images (Docker Hub, AWS ECR)
+   
+   - **Docker Image Layer System**:
+     - Each Dockerfile instruction creates a new layer
+     - **Layer Characteristics**: Immutability, incremental changes, shareability
+     - **Union Filesystem**: Combines multiple layers using overlay2 storage driver
+     - **Optimization Techniques**: Multi-stage builds, layer caching, lightweight base images (Alpine Linux)
+   
+   - **Docker Networking**:
+     - **Bridge Network (Default)**: Isolated private network with NAT for external communication
+     - **Host Network**: Direct use of host's network stack for best performance but no isolation
+     - **None Network**: Complete network isolation for security-critical workloads
+     - **Overlay Network**: Multi-host communication using VXLAN tunnels
+   
+   - **Docker Volumes and Data Management**:
+     - **Volumes (Recommended)**: Docker-managed storage in `/var/lib/docker/volumes/`
+     - **Bind Mounts**: Direct host directory mounting for development
+     - **tmpfs Mounts**: Memory-based storage for temporary data
+     - **Use Cases**: Database persistence, log collection, configuration sharing
+   
+   - **Container Registry**:
+     - **Public**: Docker Hub with official certified images
+     - **Private**: AWS ECR, Google GCR, Azure ACR, Harbor
+     - **Security**: Image scanning, RBAC, Docker Content Trust for signing
+
+2. **Hands-on Lab: Docker Installation and Basic Operations**:
+   
+   - **Docker Installation on Ubuntu** (`docker-install-ubuntu.md`):
+     - Removed existing Docker packages to avoid conflicts
+     - Set up official Docker repository with GPG key authentication
+     - Installed Docker Engine components: `docker-ce`, `docker-ce-cli`, `containerd.io`, `docker-buildx-plugin`, `docker-compose-plugin`
+     - Configured Docker service and enabled auto-start on boot
+     - Added user to docker group for non-root access
+   
+   - **Basic Docker Commands**:
+     ```bash
+     # Test installation
+     docker run hello-world
+     
+     # Image management
+     docker pull nginx:alpine
+     docker images
+     docker rmi <image-id>
+     
+     # Container lifecycle
+     docker run -d -p 8080:80 --name web nginx:alpine
+     docker ps
+     docker stop web
+     docker start web
+     docker rm web
+     
+     # Logs and debugging
+     docker logs web
+     docker exec -it web /bin/sh
+     
+     # System cleanup
+     docker system prune -a
+     ```
+   
+   - **Learning Outcomes**:
+     - Successfully installed and configured Docker on Ubuntu
+     - Understood Docker architecture through practical commands
+     - Managed image and container lifecycle operations
+     - Practiced port mapping and container networking basics
+     - Experienced container isolation and resource management
+
+## Week 07: Container Orchestration with Docker Compose and Kubernetes
+
+### Objectives
+
+- Configure multi-container applications using Docker Compose and understand its limitations
+- Explain the necessity and basic concepts of Kubernetes
+- Understand Kubernetes cluster architecture
+- Describe core Kubernetes objects like Pod, Service, and Deployment
+- Perform basic Kubernetes operations using MiniKube and kubectl
+
+### Content
+
+1. **Theory: Docker Compose and Kubernetes**:
+   
+   - **Docker Compose Basics**:
+     - Tool for defining and running multi-container applications
+     - **Need**: Modern apps consist of web servers, databases, caches, message queues, and load balancers
+     - **docker-compose.yml Structure**:
+       - `services`: Container definitions
+       - `volumes`: Data persistence
+       - `networks`: Inter-service communication
+       - Service options: image, build, ports, environment, depends_on, volumes
+     - **Workflow**: Development (service definition → execution → testing) and Production (configuration → scaling → updates → monitoring)
+   
+   - **Docker Compose Limitations**:
+     - **Single Host Constraints**: Limited scalability and no high availability
+     - **Production Limitations**: Manual recovery, limited load balancing, basic deployment strategies
+     - **Monitoring**: Limited metrics and observability, simple health checks
+   
+   - **Introduction to Kubernetes (K8s)**:
+     - Open-source platform for automating containerized application deployment, scaling, and management
+     - Originally developed by Google, now managed by CNCF
+     - **Problems Solved**: Service discovery, load balancing, self-healing, declarative configuration
+     - **Core Concepts**:
+       - **Declarative Management**: Define desired state → Monitor current state → Automatic adjustment
+       - **Controller Pattern**: Continuous monitoring → Detect differences → Adjustment actions
+   
+   - **Kubernetes Architecture**:
+     - **Control Plane (Master Node)**:
+       - **API Server**: Cluster frontend with RESTful API, authentication/authorization
+       - **etcd**: Distributed key-value store for cluster state using RAFT algorithm
+       - **Scheduler**: Pod placement decisions based on resources and constraints
+       - **Controller Manager**: Runs controllers to maintain desired state
+     - **Worker Node**:
+       - **kubelet**: Node agent for Pod management and status reporting
+       - **kube-proxy**: Network proxy for Service abstraction and load balancing
+       - **Container Runtime**: Docker, containerd, CRI-O for container execution
+   
+   - **Kubernetes Core Objects**:
+     - **Pod**: 
+       - Smallest deployable unit containing one or more containers
+       - Shared network and storage within Pod
+       - Ephemeral nature with unique cluster IP
+       - Patterns: Single container (most common), Multi-container (sidecar pattern)
+     
+     - **Service**:
+       - Abstracts network access to Pods (handles dynamic IP changes)
+       - **Types**:
+         - ClusterIP: Internal cluster access only (default)
+         - NodePort: External access through node ports
+         - LoadBalancer: Cloud provider integration for external traffic
+     
+     - **Deployment**:
+       - Provides declarative updates for Pods and ReplicaSets
+       - Functions: Replica management, rolling updates, rollback, scaling
+       - Manages ReplicaSets which create and manage actual Pods
+   
+   - **MiniKube and kubectl**:
+     - **MiniKube**: Single-node cluster for local development and learning
+     - **kubectl**: CLI tool with syntax: `kubectl [command] [TYPE] [NAME] [flags]`
+   
+   - **Kubernetes vs Docker Compose Comparison**:
+     - **Docker Compose Suitable For**: Development, small apps, prototyping, CI/CD
+     - **Kubernetes Suitable For**: Production, microservices, high availability, multi-cloud
+     - **Technical Differences**: Complexity, scalability, availability capabilities
+
+2. **Hands-on Lab Part 1: Docker Compose Multi-Container Application** (`docker_compose.txt`):
+   
+   - **Project Setup**:
+     - Created directory structure with `docker-compose.yml` and custom HTML
+     - Defined multi-service architecture with networking and data persistence
+   
+   - **Service Configuration**:
+     ```yaml
+     services:
+       web:
+         image: nginx:alpine
+         ports: ["8080:80"]
+         volumes: ["./html:/usr/share/nginx/html:ro"]
+         depends_on: [db]
+       
+       db:
+         image: postgres:13
+         environment:
+           POSTGRES_DB: myapp
+           POSTGRES_USER: admin
+           POSTGRES_PASSWORD: secret
+         volumes: [db_data:/var/lib/postgresql/data]
+       
+       redis:
+         image: redis:alpine
+     
+     volumes:
+       db_data:
+     
+     networks:
+       app-net:
+         driver: bridge
+     ```
+   
+   - **Operations Practiced**:
+     ```bash
+     # Start multi-container application
+     docker compose up -d
+     
+     # Check service status
+     docker compose ps
+     
+     # View logs
+     docker compose logs web
+     
+     # Database connection test
+     docker compose exec db psql -U admin -d myapp
+     
+     # Scale services
+     docker compose up -d --scale web=2
+     
+     # Cleanup
+     docker compose down -v
+     ```
+   
+   - **Learning Outcomes**:
+     - Configured complex multi-container applications declaratively
+     - Understood service dependencies and networking
+     - Practiced volume management for data persistence
+     - Experienced service scaling and inter-service communication
+
+3. **Hands-on Lab Part 2: Kubernetes with MiniKube** (`kubectl-minikube-install-ubuntu.md`, `my-pod.yaml`):
+   
+   - **Installation Process**:
+     - **kubectl Installation**:
+       ```bash
+       curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+       chmod +x kubectl
+       sudo mv kubectl /usr/local/bin/
+       kubectl version --client
+       ```
+     
+     - **MiniKube Installation**:
+       ```bash
+       curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+       chmod +x minikube
+       sudo mv minikube /usr/local/bin/
+       minikube version
+       ```
+     
+     - **Cluster Startup**:
+       ```bash
+       minikube start --driver=docker
+       minikube status
+       kubectl cluster-info
+       kubectl get nodes
+       ```
+   
+   - **Basic Kubernetes Operations**:
+     - Created Pod definition (`my-pod.yaml`):
+       ```yaml
+       apiVersion: v1
+       kind: Pod
+       metadata:
+         name: web-pod
+         labels:
+           app: web
+       spec:
+         containers:
+         - name: web-container
+           image: nginx:1.21
+           ports:
+           - containerPort: 80
+       ```
+     
+     - **kubectl Commands Practiced**:
+       ```bash
+       # Pod management
+       kubectl apply -f my-pod.yaml
+       kubectl get pods
+       kubectl describe pod web-pod
+       kubectl logs web-pod
+       kubectl delete pod web-pod
+       
+       # Imperative Pod creation
+       kubectl run test-pod --image=nginx:1.21
+       
+       # Cluster management
+       minikube dashboard
+       minikube stop
+       minikube start
+       ```
+   
+   - **Troubleshooting**:
+     - Configured Docker group permissions for non-root access
+     - Handled MiniKube startup failures with service restarts
+     - Used `minikube delete --all --purge` for clean reinstallation
+   
+   - **Learning Outcomes**:
+     - Successfully set up local Kubernetes development environment
+     - Understood Kubernetes object model through YAML definitions
+     - Practiced declarative (YAML) and imperative (CLI) Pod management
+     - Experienced cluster lifecycle management with MiniKube
+     - Verified Kubernetes concepts learned in theory through hands-on practice
+     - Prepared foundation for production-grade orchestration concepts
+
+---
+
+## Technologies and Tools Used
+
+- **Version Control**: Git, GitHub
+- **Cloud Platforms**: Heroku (PaaS)
+- **Virtualization**: VirtualBox, Vagrant
+- **Containers**: Docker, Docker Compose
+- **Orchestration**: Kubernetes, MiniKube, kubectl
+- **Operating Systems**: Ubuntu 24.04, Arch Linux
+- **Web Servers**: Apache, Nginx
+- **Databases**: PostgreSQL
+- **Caching**: Redis
+- **Programming**: Python (Flask), Shell scripting
+
+## Learning Path Summary
+
+1. **Weeks 1-2**: Cloud fundamentals and service models
+2. **Week 3**: Deployment models and version control with Git
+3. **Weeks 4-5**: Infrastructure concepts through virtualization
+4. **Week 6**: Container technology and Docker fundamentals
+5. **Week 7**: Multi-container apps and Kubernetes orchestration
+6. **Week 8**: Midterm Exam
