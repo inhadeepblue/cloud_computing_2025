@@ -1,0 +1,6 @@
+This is a test file with more content.
+Line 1: Introduction to Cloud Storage
+Line 2: Object Storage Concepts
+Line 3: MinIO S3-Compatible Storage
+Line 4: Docker-based Local Environment
+Line 5: Week 09 Lab Exercise
